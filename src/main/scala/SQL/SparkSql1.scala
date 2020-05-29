@@ -8,11 +8,13 @@ object SparkSql1 {
   def main(args: Array[String]): Unit = {
 
     Logger.getLogger("org").setLevel(Level.ERROR);
+
     /* SparkSession */
     val ss = SparkSession.builder()
       .appName("RETAIL")
       .master("local")
       .getOrCreate()
+
     /* orders */
     val schema_orders = new StructType() // orderId,orderDate,orderCustomerId,orderStatus
       .add("orderId",IntegerType,false)
@@ -24,8 +26,8 @@ object SparkSql1 {
       .option("header", "true")
       .schema(schema_orders)
       .load("C:\\Users\\msi\\Desktop\\orders.csv")
-    orders.printSchema()
-    orders.show(false)
+    //orders.printSchema()
+    //orders.show(false)
 
     orders.createOrReplaceTempView("orders")
 
@@ -42,8 +44,8 @@ object SparkSql1 {
       .option("header", "true")
       .schema(schema_order_items)
       .load("C:\\Users\\msi\\Desktop\\order_items.csv")
-    order_items.printSchema()
-    order_items.show(false)
+    //order_items.printSchema()
+    //order_items.show(false)
 
     order_items.createOrReplaceTempView("order_items")
 
@@ -60,8 +62,8 @@ object SparkSql1 {
       .option("header", "true")
       .schema(schema_products)
       .load("C:\\Users\\msi\\Desktop\\products.csv")
-    products.printSchema()
-    products.show(false)
+    //products.printSchema()
+    //products.show(false)
 
     products.createOrReplaceTempView("products")
 
@@ -75,30 +77,28 @@ object SparkSql1 {
       .option("header", "true")
       .schema(schema_categories)
       .load("C:\\Users\\msi\\Desktop\\categories.csv")
-    categories.printSchema()
-    categories.show(false)
+    //categories.printSchema()
+    //categories.show(false)
 
     categories.createOrReplaceTempView("categories")
 
-    /*
+
     val step1 = ss.sql("SELECT * FROM orders WHERE orderStatus ='CANCELED'")
     step1.show()
-    println("step1.count()")
-    println(step1.count())
-    step1.withColumn("orderId",col("orderId").cast("Integer"))
+    //println("step1.count()")
+    //println(step1.count())
+    //step1.printSchema()
 
-    step1.printSchema()
-
-    val step2 = ss.sql("SELECT * FROM order_items")
-    step2.printSchema()
-    */
-    /*order_items.join(step1,order_items("orderItemOrderId") ===  step1("orderId"),"inner")
+    /*val abc = order_items.join(step1,order_items("orderItemOrderId") ===  step1("orderId"),"inner")
       .show(false)*/
 
 
-    //step1.createOrReplaceTempView("step1")
+    ss.sql("SELECT * FROM orders,order_items WHERE orders.orderId = order_items.orderItemOrderId AND orders.orderStatus ='CANCELED'").show(false)
 
-    //val step2 = step1.sortWithinPartitions("order_items.orderItemSubTotal").show(false)
+
+
+
+    //val abc2 = abc.sortWithinPartitions("order_items.orderItemSubTotal")
 
     //val abc2 = ss.sql("SELECT form")
 
