@@ -25,7 +25,7 @@ object SparkSql1 {
     val orders = ss.read.format("csv")
       .option("header", "true")
       .schema(schema_orders)
-      .load("C:\\Users\\msi\\Desktop\\orders.csv")
+      .load("./datasets/orders.csv")
     //orders.printSchema()
     //orders.show(false)
 
@@ -43,7 +43,7 @@ object SparkSql1 {
     val order_items = ss.read.format("csv")
       .option("header", "true")
       .schema(schema_order_items)
-      .load("C:\\Users\\msi\\Desktop\\order_items.csv")
+      .load("./datasets/order_items.csv")
     //order_items.printSchema()
     //order_items.show(false)
 
@@ -61,7 +61,7 @@ object SparkSql1 {
     val products = ss.read.format("csv")
       .option("header", "true")
       .schema(schema_products)
-      .load("C:\\Users\\msi\\Desktop\\products.csv")
+      .load("./datasets/products.csv")
     //products.printSchema()
     //products.show(false)
 
@@ -76,7 +76,7 @@ object SparkSql1 {
     val categories = ss.read.format("csv")
       .option("header", "true")
       .schema(schema_categories)
-      .load("C:\\Users\\msi\\Desktop\\categories.csv")
+      .load("./datasets/categories.csv")
     //categories.printSchema()
     //categories.show(false)
 
@@ -93,6 +93,7 @@ object SparkSql1 {
 
     val top_product = ss.sql("SELECT orderItemProductId, productName, SUM(orderItemSubTotal) FROM canceled_products GROUP BY orderItemProductId, productName ORDER BY SUM(orderItemSubTotal) DESC")
     top_product.show()
+    top_product.write.parquet("output/product.parquet")
 
     val canceled_categories = ss.sql("SELECT * FROM canceled_products,categories WHERE canceled_products.productCategoryId = categories.categoryId ORDER BY canceled_products.orderItemSubTotal DESC")
     canceled_categories.createOrReplaceTempView("canceled_categories")
@@ -101,6 +102,7 @@ object SparkSql1 {
 
     val top_categories = ss.sql("SELECT categoryName, SUM(orderItemSubTotal) FROM canceled_categories GROUP BY categoryName ORDER BY SUM(orderItemSubTotal) DESC")
     top_categories.show()
+    top_categories.write.parquet("output/categories.parquet")
 
   }
 }
