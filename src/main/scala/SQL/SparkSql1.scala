@@ -85,55 +85,22 @@ object SparkSql1 {
 
     val canceled = ss.sql("SELECT * FROM orders,order_items WHERE orders.orderId = order_items.orderItemOrderId AND orders.orderStatus ='CANCELED' ORDER BY order_items.orderItemSubTotal DESC")
     canceled.createOrReplaceTempView("canceled")
-    canceled.show()
+    //canceled.show()
 
     val canceled_products = ss.sql("SELECT orderItemProductId, productCategoryId, productName, orderItemSubTotal FROM canceled,products WHERE canceled.orderItemProductId = products.productId ORDER BY canceled.orderItemSubTotal DESC")
     canceled_products.createOrReplaceTempView("canceled_products")
-    canceled_products.show()
+    //canceled_products.show()
 
     val top_product = ss.sql("SELECT orderItemProductId, productName, SUM(orderItemSubTotal) FROM canceled_products GROUP BY orderItemProductId, productName ORDER BY SUM(orderItemSubTotal) DESC")
     top_product.show()
 
     val canceled_categories = ss.sql("SELECT * FROM canceled_products,categories WHERE canceled_products.productCategoryId = categories.categoryId ORDER BY canceled_products.orderItemSubTotal DESC")
     canceled_categories.createOrReplaceTempView("canceled_categories")
-    canceled_categories.show()
+    //canceled_categories.show()
 
-    //val deneme = ss.sql("SELECT productCategoryId, SUM(orderItemSubTotal) FROM canceled_products GROUP BY productCategoryId ORDER BY SUM(orderItemSubTotal) DESC")
-    //deneme.createOrReplaceTempView("deneme")
-    //deneme.show()
-
-    //val deneme2 = ss.sql("SELECT * FROM deneme,categories WHERE deneme.productCategoryId = categories.categoryId ORDER BY (orderItemSubTotal) DESC")
-    //deneme2.show()
 
     val top_categories = ss.sql("SELECT categoryName, SUM(orderItemSubTotal) FROM canceled_categories GROUP BY categoryName ORDER BY SUM(orderItemSubTotal) DESC")
     top_categories.show()
-
-
-
-
-    //val step2 = ss.sql("SHOW DATABASES")
-    //step2.show()
-
-    /*val step3 = ss.sql("CREATE DATABASE dilisim")
-    step3.show()*/
-
-    //val step3 = ss.sql("SHOW TABLES")
-    //step3.show()
-
-
-
-    //val step4 = ss.sql("ALTER ")
-    //step4.show()
-
-    //df.createOrReplaceTempView("test")
-
-    /*ss.sql(
-      sqlText =
-        """
-          SELECT FROM orders
-          WHERE orderStatus LIKE 'CANCELED'
-          """).show(numRows = 100)*/
-    //df.show()
 
   }
 }
