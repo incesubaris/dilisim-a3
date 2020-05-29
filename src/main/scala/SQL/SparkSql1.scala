@@ -83,25 +83,30 @@ object SparkSql1 {
     categories.createOrReplaceTempView("categories")
 
 
-    val step1 = ss.sql("SELECT * FROM orders WHERE orderStatus ='CANCELED'")
-    step1.show()
-    //println("step1.count()")
-    //println(step1.count())
-    //step1.printSchema()
+    val canceled = ss.sql("SELECT * FROM orders,order_items WHERE orders.orderId = order_items.orderItemOrderId AND orders.orderStatus ='CANCELED' ORDER BY order_items.orderItemSubTotal DESC")
+    canceled.createOrReplaceTempView("canceled")
+    canceled.show()
 
-    /*val abc = order_items.join(step1,order_items("orderItemOrderId") ===  step1("orderId"),"inner")
-      .show(false)*/
+    val canceled_products = ss.sql("SELECT orderItemProductId, productCategoryId, productName, orderItemSubTotal FROM canceled,products WHERE canceled.orderItemProductId = products.productId ORDER BY canceled.orderItemSubTotal DESC")
+    canceled_products.createOrReplaceTempView("canceled_products")
+    canceled_products.show()
 
+    val top_product = ss.sql("SELECT orderItemProductId, productName, SUM(orderItemSubTotal) FROM canceled_products GROUP BY orderItemProductId, productName ORDER BY SUM(orderItemSubTotal) DESC")
+    top_product.show()
 
-    ss.sql("SELECT * FROM orders,order_items WHERE orders.orderId = order_items.orderItemOrderId AND orders.orderStatus ='CANCELED'").show(false)
+    val canceled_categories = ss.sql("SELECT * FROM canceled_products,categories WHERE canceled_products.productCategoryId = categories.categoryId ORDER BY canceled_products.orderItemSubTotal DESC")
+    canceled_categories.createOrReplaceTempView("canceled_categories")
+    canceled_categories.show()
 
+    //val deneme = ss.sql("SELECT productCategoryId, SUM(orderItemSubTotal) FROM canceled_products GROUP BY productCategoryId ORDER BY SUM(orderItemSubTotal) DESC")
+    //deneme.createOrReplaceTempView("deneme")
+    //deneme.show()
 
+    //val deneme2 = ss.sql("SELECT * FROM deneme,categories WHERE deneme.productCategoryId = categories.categoryId ORDER BY (orderItemSubTotal) DESC")
+    //deneme2.show()
 
-
-    //val abc2 = abc.sortWithinPartitions("order_items.orderItemSubTotal")
-
-    //val abc2 = ss.sql("SELECT form")
-
+    val top_categories = ss.sql("SELECT categoryName, SUM(orderItemSubTotal) FROM canceled_categories GROUP BY categoryName ORDER BY SUM(orderItemSubTotal) DESC")
+    top_categories.show()
 
 
 
